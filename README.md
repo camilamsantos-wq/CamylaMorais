@@ -64,22 +64,24 @@ tempo real (é assim que ele monta o buffer entre um envio e outro). Numa VPS Ub
 Oracle Free Tier:
 
 ```bash
-# Instalar Node.js (18+) e pm2
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-sudo npm install -g pm2
-
-# Clonar e configurar o projeto
+# Clonar o projeto
 git clone <url-do-repositorio>
 cd CamylaMorais
-npm install
-cp .env.example .env    # ajuste se necessário
 
-# Primeiro login (gera QR no terminal, precisa ser interativo)
+# Instala Node.js, pm2 e as dependências do projeto, e prepara o .env
+bash scripts/setup-vps.sh
+```
+
+O script `scripts/setup-vps.sh` automatiza a instalação (Node.js, pm2, `npm install`,
+criação do `.env`) e imprime no final os dois passos que ainda precisam ser feitos à
+mão, por serem interativos:
+
+```bash
+# 1) Primeiro login (gera QR no terminal, precisa ser interativo)
 node index.js
 # escaneie o QR, confirme nos logs que os 3 grupos foram resolvidos, depois Ctrl+C
 
-# Subir com pm2 para rodar em segundo plano e reiniciar sozinho
+# 2) Subir com pm2 para rodar em segundo plano e reiniciar sozinho
 pm2 start ecosystem.config.js
 pm2 save
 pm2 startup     # siga a instrução impressa para sobreviver a reboots da VPS
@@ -118,6 +120,7 @@ src/keywordFilter.js   regra que decide o que é vaga de emprego
 src/forwarder.js       lê o buffer, filtra e encaminha para o grupo de destino
 src/scheduler.js       agenda os dois envios diários (cron)
 src/listGroups.js      utilitário: lista nome + JID de todos os grupos da conta
+scripts/setup-vps.sh   instala Node.js, pm2 e dependências numa VPS nova
 auth/                  sessão autenticada do WhatsApp (não versionar, fazer backup)
 data/                  buffer de mensagens pendentes (não versionar)
 ```
